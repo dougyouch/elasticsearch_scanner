@@ -8,11 +8,12 @@ class ElasticSearchScanner
   attr_reader :total_request_time,
               :total_elasticsearch_time
 
-  def initialize(url, query, size=100, scroll_ttl='1m')
+  def initialize(url, query, size=100, scroll_ttl = '1m', max_retries = 5)
     @url = url
     @query = query
     @size = size
     @scroll_ttl = scroll_ttl
+    @max_retries = max_retries
     @fields_to_return = true # all fields
     @has_more = true
     @total_request_time = 0.0
@@ -85,5 +86,13 @@ class ElasticSearchScanner
     @scroll_id = data['_scroll_id']
     @has_more = data['hits']['hits'].size == @size
     data['hits']['hits']
+  rescue Net::ReadTimeout => e
+    attempts ||= 0
+    attempts += 1
+    if attempts < @max_retries
+      sleep([0.1, 0.2, 0.4, 1.0][attempts-1] || 1.0)
+      retry
+    end
+    raise e
   end
 end

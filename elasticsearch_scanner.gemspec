@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'elasticsearch_scanner'
-  s.version     = '0.1.2'
+  s.version     = '0.1.5'
   s.licenses    = ['MIT']
   s.summary     = 'ElasticSearch index scanner'
   s.description = 'Iterates over the entire index'
